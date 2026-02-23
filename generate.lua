@@ -7,6 +7,8 @@ vim.opt.runtimepath:prepend(mini_dir)
 local MiniHues = require('mini.hues')
 local MiniColors = require('mini.colors')
 
+local hl_set = vim.api.nvim_set_hl
+
 -- =============================================================================
 
 -- Create a color palette from a given color hue
@@ -25,10 +27,22 @@ local palette_create = function(hue)
   return palette
 end
 
--- Create a colorscheme object from a given color palette
-local scheme_create = function(palette)
+-- Apply a color palette to generate highlight groups
+local palette_apply = function(palette)
   vim.cmd('highlight clear')
   MiniHues.apply_palette(palette)
+
+  for key, val in pairs(palette) do
+    if key ~= '_' then
+      hl_set(0, 'palette.fg.' .. key, { fg = val })
+      hl_set(0, 'palette.bg.' .. key, { bg = val })
+    end
+  end
+end
+
+-- Create a colorscheme object from a given color palette
+local scheme_create = function(palette)
+  palette_apply(palette)
   local scheme =  MiniColors.get_colorscheme(nil, {
     new_name = 'minihuit-' .. palette._.hue
   })
