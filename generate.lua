@@ -70,6 +70,8 @@ local hl_adjust = function()
   })
 
   hl_set(0, 'FlashMatch', { link = 'MiniJump' })
+  hl_set(0, '@function', { link = 'palette.fg.blue' })
+  hl_set(0, 'Function', { link = '@function' })
 end
 
 -- Provide a highlight groups filetring function
@@ -106,8 +108,15 @@ local scheme_tweak = function(scheme)
     })
   end
   local lighten = function(v, n, a) add('lightness', v, n, a) end
+  local saturate = function(v, n, a) add('saturation', v, n, a) end
+  local exact = function(v) return '^' .. v .. '$' end
+  local fg_sp = { 'fg', 'sp' }
 
-  lighten(95, '^MiniJump$', { 'fg', 'sp' })
+  -- Saturate all foregrounds, for better contrasts
+  saturate('+15', {}, fg_sp)
+
+  -- Turn jumps marks almost white
+  lighten(95, exact('MiniJump'), fg_sp)
 
   return scheme
 end
