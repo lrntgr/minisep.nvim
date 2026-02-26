@@ -89,13 +89,31 @@ local sch_generate = function(hue, name)
   end
 
   -- Add/modify some highlight groups
-  -- TODO
+  hl_derive('MiniJump', 'Normal', {
+    { bg = false }, { sp = 'fg' }, { bold = true }, { undercurl = true }
+  })
+  hl_set(0, 'FlashLabel', { link = 'MiniJump' })
+  hl_derive('FlashMatch', 'palette.yellow', {
+    { bg = false }, { sp = 'fg' }, { bold = true }, { undercurl = true },
+  })
+  hl_derive('MiniPickMatchCurrent', 'MiniPickMatchCurrent', {
+    { bold = true }, { undercurl = false },
+  })
+  hl_set(0, '@function', { link = 'palette.blue' })
+  hl_derive('MiniPickMatchRanges', '@function', {
+    { bold = true }, { undercurl = true },
+  })
+  hl_set(0, 'Function', { link = '@function' })
+  hl_set(0, 'Directory', { link = '@function' })
 
   -- Get the colorscheme representation
   local sch = MiniColors.get_colorscheme(nil, { new_name = name })
 
   -- Tweak colorscheme content
-  sch = sch_modify(sch, 'saturation', '+15', {}, { 'fg', 'sp' })
+  local exact = function(v) return '^' .. v .. '$' end
+  sch = sch_modify(sch, 'saturation', '+15', nil, { 'fg', 'sp' })
+  sch = sch_modify(sch, 'lightness', 95, exact('MiniJump'), { 'fg', 'sp' })
+  sch = sch_modify(sch, 'saturation', 100, exact('FlashMatch'), { 'fg', 'sp' })
 
   -- Write colorscheme to file
   sch:write({ directory = cwd .. '/colors' })
