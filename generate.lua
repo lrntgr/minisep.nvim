@@ -45,12 +45,18 @@ local hl_filter_func = function(names, attrs)
     local match_attr = (#attrs == 0)
     if not match_name then
       for _, name in ipairs(names) do
-        if data.name:find(name) then match_name = true break end
+        if data.name:find(name) then
+          match_name = true
+          break
+        end
       end
     end
     if match_name and (not match_attr) then
       for _, attr in ipairs(attrs) do
-        if data.attr == attr then match_attr = true break end
+        if data.attr == attr then
+          match_attr = true
+          break
+        end
       end
     end
     return match_name and match_attr
@@ -71,7 +77,7 @@ local sch_generate = function(hue, name)
 
   -- Clear all highlighting
   vim.cmd('highlight clear')
-  for i =0,15 do vim.g['terminal_color_' .. i] = nil end
+  for i = 0, 15 do vim.g['terminal_color_' .. i] = nil end
 
   -- Create a color palette, and apply it
   local palette = MiniHues.make_palette({
@@ -123,7 +129,7 @@ end
 
 local hue_nb = 1
 local hue_gap = 360 / (hue_nb + 1)
-for i=1,hue_nb do
+for i = 1, hue_nb do
   local hue = i * hue_gap
   print(string.format("[generate.lua] Generate hue='%u'", hue))
   sch_generate(hue)
