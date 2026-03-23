@@ -79,6 +79,17 @@ local hl_filter_func = function(sch, names, attrs)
   end
 end
 
+-- Mix two colors together
+local color_mix = function(val, ref)
+  local a = MiniColors.convert(string.format('#%x', val), 'oklch')
+  local b = MiniColors.convert(string.format('#%x', ref), 'oklch')
+  return MiniColors.convert({
+    l = (a.l + b.l) / 2,
+    c = (a.c + b.c) / 2,
+    h = (a.h + b.h) / 2,
+  }, 'hex')
+end
+
 -- Modify a colorscheme's channel (eg. saturation, lightness... etc)
 local sch_modify = function(sch, chan, val, names, attrs)
   local links = sch._.links
@@ -135,7 +146,7 @@ local sch_generate = function(hue, name)
     hl_set(0, 'palette.' .. key, { fg = val })
   end
 
-  -- Add/modify some highlight groups
+  -- Tweak navigation highlighting
   hl_derive(0, 'MiniJump', 'Normal', {
     { bg = false }, { sp = 'fg' }, { bold = true }, { undercurl = true }
   })
@@ -147,10 +158,13 @@ local sch_generate = function(hue, name)
   hl_derive(0, 'MiniPickMatchCurrent', 'MiniPickMatchCurrent', {
     { bold = true }, { undercurl = false },
   })
-  hl_set(0, '@function', { link = 'palette.blue' })
-  hl_derive(0, 'MiniPickMatchRanges', '@function', {
+  hl_derive(0, 'MiniPickMatchRanges', 'palette.blue', {
     { bold = true }, { undercurl = true },
   })
+
+  -- Tweak syntax highlighting
+  hl_set(0, '@function', { link = 'palette.blue' })
+  hl_derive(0, '@function', '@variable', { clear = false, { fg = color_mix } })
   hl_set(0, 'Function', { link = '@function' })
   hl_set(0, 'Directory', { link = '@function' })
 
