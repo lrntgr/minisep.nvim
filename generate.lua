@@ -32,7 +32,9 @@ local hl_derive = function(ns, name, name_ref, changes)
           name_ref = name_ref,
           ns = ns,
         })
-      elseif data_ref[val] ~= nil then
+      elseif data[val] ~= nil then
+        data[key] = data[val]
+      elseif data[val] ~= nil then
         data[key] = data_ref[val]
       else
         data[key] = val
@@ -139,7 +141,8 @@ local sch_generate = function(hue, name)
   })
   hl_set(0, 'FlashLabel', { link = 'MiniJump' })
   hl_derive(0, 'FlashMatch', 'palette.yellow', {
-    { bg = false }, { sp = 'fg' }, { bold = true }, { undercurl = true },
+    { bg = false }, { fg = 'yellow' },
+    { sp = 'fg' }, { bold = true }, { undercurl = true },
   })
   hl_derive(0, 'MiniPickMatchCurrent', 'MiniPickMatchCurrent', {
     { bold = true }, { undercurl = false },
