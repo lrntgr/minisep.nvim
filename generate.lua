@@ -16,14 +16,24 @@ local hl_get = vim.api.nvim_get_hl
 -- Derive a highlight group from a reference one
 local hl_derive = function(ns, name, name_ref, changes)
   changes = changes or {}
+  changes.clear = (changes.clear == nil) and true or changes.clear
+  local data = changes.clear and {} or hl_get(ns, { name = name, link = false })
+  local data_ref = hl_get(ns, { name = name_ref, link = false })
+  data = vim.tbl_deep_extend('keep', data, data_ref)
 
-  local data = hl_get(ns, { name = name_ref, link = false })
   for _, change in ipairs(changes) do
     for key, val in pairs(change) do
       if val == false then
         data[key] = nil
-      elseif data[val] ~= nil then
-        data[key] = data[val]
+      elseif type(val) == 'function' then
+        data[key] = val(data[key], data_ref[key], {
+          key = key,
+          name = name,
+          name_ref = name_ref,
+          ns = ns,
+        })
+      elseif data_ref[val] ~= nil then
+        data[key] = data_ref[val]
       else
         data[key] = val
       end
