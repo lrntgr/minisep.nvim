@@ -36,20 +36,19 @@ local hl_derive = function(name, name_ref, changes)
 end
 
 -- Provide a filtering function for highlight groups and attributes
-local hl_filter_func = function(names, attrs)
+local hl_filter_func = function(sch, names, attrs)
   names = (type(names) ~= 'table') and { names } or names
   attrs = (type(attrs) ~= 'table') and { attrs } or attrs
 
   return function(_, data)
+    local matched_names = {}
     local match_name = (#names == 0)
     local match_attr = (#attrs == 0)
     if not match_name then
       for _, name in ipairs(names) do
-        if data.name:find(name) then
-          match_name = true
-          break
-        end
+        if data.name:find(name) then table.insert(matched_names, data.name) end
       end
+      match_name = (#matched_names > 0)
     end
     if match_name and (not match_attr) then
       for _, attr in ipairs(attrs) do
@@ -59,16 +58,47 @@ local hl_filter_func = function(names, attrs)
         end
       end
     end
-    return match_name and match_attr
+    local ok = match_name and match_attr
+    if ok then
+      for _, name in ipairs(matched_names) do
+        sch._.links[name] = nil
+      end
+    end
+    return ok
   end
 end
 
 -- Modify a colorscheme's channel (eg. saturation, lightness... etc)
 local sch_modify = function(sch, chan, val, names, attrs)
+  local links = sch._.links
   local add = (type(val) == 'string') and (tonumber(val) ~= nil)
   local func = add and 'chan_add' or 'chan_set'
+  local filter_func = hl_filter_func(sch, names, attrs)
   val = add and tonumber(val) or val
-  return sch[func](sch, chan, val, { filter = hl_filter_func(names, attrs) })
+  local sch_new = sch[func](sch, chan, val, { filter = filter_func })
+  sch_new._.links = links
+  return sch_new
+end
+
+-- Save highlight groups links
+local sch_links_save = function(sch)
+  sch._ = sch._ or {}
+  sch._.links = {}
+  for name, val in pairs(sch.groups) do
+    if val.link then
+      sch._.links[name] = val.link
+    end
+  end
+end
+
+-- Restore highlight groups links
+local sch_links_restore = function(sch)
+  sch._ = sch._ or {}
+  for name, link in pairs(sch._.links or {}) do
+    if sch.groups[link] ~= nil then
+      sch.groups[name] = { link = link }
+    end
+  end
 end
 
 -- Generate a new colorscheme
@@ -115,11 +145,18 @@ local sch_generate = function(hue, name)
   -- Get the colorscheme representation
   local sch = MiniColors.get_colorscheme(nil, { new_name = name })
 
+  -- Record initial links before resolving them
+  sch_links_save(sch)
+  sch = sch:resolve_links()
+
   -- Tweak colorscheme content
   local exact = function(v) return '^' .. v .. '$' end
   sch = sch_modify(sch, 'saturation', '+15', nil, { 'fg', 'sp' })
   sch = sch_modify(sch, 'lightness', 95, exact('MiniJump'), { 'fg', 'sp' })
   sch = sch_modify(sch, 'saturation', 100, exact('FlashMatch'), { 'fg', 'sp' })
+
+  -- Restore highlight groups links
+  sch_links_restore(sch)
 
   -- Write colorscheme to file
   sch:write({ directory = cwd .. '/colors' })
