@@ -14,9 +14,8 @@ local hl_get = vim.api.nvim_get_hl
 -- =============================================================================
 
 -- Derive a highlight group from a reference one
-local hl_derive = function(name, name_ref, changes)
+local hl_derive = function(ns, name, name_ref, changes)
   changes = changes or {}
-  local ns = changes.ns or 0
 
   local data = hl_get(ns, { name = name_ref, link = false })
   for _, change in ipairs(changes) do
@@ -125,18 +124,18 @@ local sch_generate = function(hue, name)
   end
 
   -- Add/modify some highlight groups
-  hl_derive('MiniJump', 'Normal', {
+  hl_derive(0, 'MiniJump', 'Normal', {
     { bg = false }, { sp = 'fg' }, { bold = true }, { undercurl = true }
   })
   hl_set(0, 'FlashLabel', { link = 'MiniJump' })
-  hl_derive('FlashMatch', 'palette.yellow', {
+  hl_derive(0, 'FlashMatch', 'palette.yellow', {
     { bg = false }, { sp = 'fg' }, { bold = true }, { undercurl = true },
   })
-  hl_derive('MiniPickMatchCurrent', 'MiniPickMatchCurrent', {
+  hl_derive(0, 'MiniPickMatchCurrent', 'MiniPickMatchCurrent', {
     { bold = true }, { undercurl = false },
   })
   hl_set(0, '@function', { link = 'palette.blue' })
-  hl_derive('MiniPickMatchRanges', '@function', {
+  hl_derive(0, 'MiniPickMatchRanges', '@function', {
     { bold = true }, { undercurl = true },
   })
   hl_set(0, 'Function', { link = '@function' })
