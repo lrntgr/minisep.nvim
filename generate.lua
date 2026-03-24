@@ -176,10 +176,17 @@ local sch_generate = function(hue, name)
   sch = sch:resolve_links()
 
   -- Tweak colorscheme content
-  local exact = function(v) return '^' .. v .. '$' end
+  local exact = function(...)
+    local ret = {}
+    for _, v in ipairs({ ... }) do table.insert(ret, '^' .. v .. '$') end
+    return ret
+  end
+  local saturate_max = exact('FlashMatch', '@parameter')
   sch = sch_modify(sch, 'saturation', '+20', nil, { 'fg', 'sp' })
   sch = sch_modify(sch, 'lightness', 95, exact('MiniJump'), { 'fg', 'sp' })
-  sch = sch_modify(sch, 'saturation', 100, exact('FlashMatch'), { 'fg', 'sp' })
+  sch = sch_modify(sch, 'saturation', 100, saturate_max, { 'fg', 'sp' })
+  sch = sch_modify(sch, 'hue', '+150', exact('Constant'), { 'fg' })
+  sch = sch_modify(sch, 'lightness', '-10', exact('Constant'), { 'fg' })
 
   -- Restore highlight groups links
   sch_links_restore(sch)
