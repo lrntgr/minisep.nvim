@@ -32,10 +32,10 @@ local hl_derive = function(ns, name, name_ref, changes)
           name_ref = name_ref,
           ns = ns,
         })
+      elseif data_ref[val] ~= nil then
+        data[key] = data_ref[val]
       elseif data[val] ~= nil then
         data[key] = data[val]
-      elseif data[val] ~= nil then
-        data[key] = data_ref[val]
       else
         data[key] = val
       end
@@ -151,7 +151,7 @@ local sch_generate = function(hue, name)
     { bg = false }, { sp = 'fg' }, { bold = true }, { undercurl = true }
   })
   hl_set(0, 'FlashLabel', { link = 'MiniJump' })
-  hl_derive(0, 'FlashMatch', 'palette.yellow', {
+  hl_derive(0, 'FlashMatch', 'FlashMatch', {
     { bg = false }, { fg = 'yellow' },
     { sp = 'fg' }, { bold = true }, { undercurl = true },
   })
@@ -166,7 +166,12 @@ local sch_generate = function(hue, name)
   hl_set(0, '@function', { link = 'palette.blue' })
   hl_derive(0, '@function', '@variable', { clear = false, { fg = color_mix } })
   hl_set(0, 'Function', { link = '@function' })
-  hl_set(0, 'Directory', { link = '@function' })
+  hl_set(0, 'Directory', { link = 'palette.blue' })
+  hl_derive(0, '@keyword.return', 'palette.yellow', {
+    clear = false, { fg = 'fg' }
+  })
+  hl_set(0, 'Type', { link = 'Identifier' })
+  hl_set(0, 'PreProc', { link = 'palette.purple' })
 
   -- Get the colorscheme representation
   local sch = MiniColors.get_colorscheme(nil, { new_name = name })
@@ -181,12 +186,16 @@ local sch_generate = function(hue, name)
     for _, v in ipairs({ ... }) do table.insert(ret, '^' .. v .. '$') end
     return ret
   end
-  local saturate_max = exact('FlashMatch', '@parameter')
+  local saturate_max = exact('FlashMatch', '@parameter', 'Special')
+  local darken = exact('Constant', '@keyword.return', 'PreProc')
   sch = sch_modify(sch, 'saturation', '+20', nil, { 'fg', 'sp' })
+  sch = sch_modify(sch, 'saturation', '-10', exact('Normal'), { 'fg', 'sp' })
   sch = sch_modify(sch, 'lightness', 95, exact('MiniJump'), { 'fg', 'sp' })
   sch = sch_modify(sch, 'saturation', 100, saturate_max, { 'fg', 'sp' })
   sch = sch_modify(sch, 'hue', '+150', exact('Constant'), { 'fg' })
-  sch = sch_modify(sch, 'lightness', '-10', exact('Constant'), { 'fg' })
+  sch = sch_modify(sch, 'lightness', '-10', darken, { 'fg' })
+  sch = sch_modify(sch, 'lightness', '-15', exact('Special'), { 'fg' })
+  sch = sch_modify(sch, 'saturation', '-10', exact('CursorColumn'), {})
 
   -- Restore highlight groups links
   sch_links_restore(sch)
