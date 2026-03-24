@@ -206,7 +206,7 @@ end
 
 -- =============================================================================
 
-local hue_nb = 1
+local hue_nb = 7
 local hue_gap = 360 / (hue_nb + 1)
 for i = 1, hue_nb do
   local hue = i * hue_gap
