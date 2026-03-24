@@ -134,7 +134,7 @@ local sch_generate = function(hue, name)
   -- Create a color palette, and apply it
   local palette = MiniHues.make_palette({
     background = MiniColors.convert({ l = 15, c = 3, h = hue }, 'hex'),
-    foreground = MiniColors.convert({ l = 85, c = 3, h = hue }, 'hex'),
+    foreground = MiniColors.convert({ l = 80, c = 1, h = hue }, 'hex'),
     n_hues = 8,
     accent = 'bg',
     saturation = 'medium'
@@ -177,7 +177,7 @@ local sch_generate = function(hue, name)
 
   -- Tweak colorscheme content
   local exact = function(v) return '^' .. v .. '$' end
-  sch = sch_modify(sch, 'saturation', '+15', nil, { 'fg', 'sp' })
+  sch = sch_modify(sch, 'saturation', '+20', nil, { 'fg', 'sp' })
   sch = sch_modify(sch, 'lightness', 95, exact('MiniJump'), { 'fg', 'sp' })
   sch = sch_modify(sch, 'saturation', 100, exact('FlashMatch'), { 'fg', 'sp' })
 
