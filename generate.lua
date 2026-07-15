@@ -172,6 +172,7 @@ local sch_generate = function(hue, name)
   })
   hl_set(0, 'Type', { link = 'Identifier' })
   hl_set(0, 'PreProc', { link = 'palette.purple' })
+  hl_set(0, 'SnacksPickerMatch', { link = 'MiniPickMatchRanges' })
 
   -- Get the colorscheme representation
   local sch = MiniColors.get_colorscheme(nil, { new_name = name })
