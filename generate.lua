@@ -188,13 +188,15 @@ local sch_generate = function(hue, name)
     return ret
   end
   local saturate_max = exact('FlashMatch', '@parameter', 'Special')
-  local darken = exact('Constant', '@keyword.return', 'PreProc')
+  local darken = exact('@keyword.return', 'PreProc')
+  local lighten = exact('Constant')
   sch = sch_modify(sch, 'saturation', '+20', nil, { 'fg', 'sp' })
   sch = sch_modify(sch, 'saturation', '-10', exact('Normal'), { 'fg', 'sp' })
   sch = sch_modify(sch, 'lightness', 95, exact('MiniJump'), { 'fg', 'sp' })
   sch = sch_modify(sch, 'saturation', 100, saturate_max, { 'fg', 'sp' })
-  sch = sch_modify(sch, 'hue', '+150', exact('Constant'), { 'fg' })
+  sch = sch_modify(sch, 'hue', '+20', exact('Constant'), { 'fg' })
   sch = sch_modify(sch, 'lightness', '-10', darken, { 'fg' })
+  sch = sch_modify(sch, 'lightness', '+10', lighten, { 'fg' })
   sch = sch_modify(sch, 'lightness', '-15', exact('Special'), { 'fg' })
   sch = sch_modify(sch, 'saturation', '-10', exact('CursorColumn'), {})
 
