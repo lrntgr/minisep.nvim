@@ -14,7 +14,7 @@ $(COLORS_DIR):
 	@mkdir -p $(COLORS_DIR)
 
 $(MINIHUIT_COLORSCHEMES): $(COLORS_DIR) $(MINI_GIT_DIR) generate.lua
-	@nvim --headless --clean -l generate.lua
+	@nvim --headless --noplugin --clean -l generate.lua
 
 clean:
 	@rm -rf $(COLORS_DIR)
